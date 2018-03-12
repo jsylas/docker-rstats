@@ -99,9 +99,33 @@ RUN apt-get install -y libzmq3-dev && \
     touch /root/.jupyter/jupyter_nbconvert_config.py && touch /root/.jupyter/migrated
 
 # Tensorflow and Keras
+# Tensorflow source build
+ENV TF_NEED_CUDA=1
+ENV TF_CUDA_VERSION=9.1
+# Precompile for Tesla k80 and p100.  See https://developer.nvidia.com/cuda-gpus.
+ENV TF_CUDA_COMPUTE_CAPABILITIES=3.7,6.0
+ENV TF_CUDNN_VERSION=7
 ENV KERAS_BACKEND="tensorflow"
-RUN pip install virtualenv && \
-    R -e 'keras::install_keras(tensorflow = "https://github.com/mind/wheels/releases/download/tf1.5-gpu-cuda91-nomkl/tensorflow-1.5.0-cp27-cp27mu-linux_x86_64.whl")'
+RUN apt-get update && \
+    apt-get install -y curl gnupg zip && \
+    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee -a /etc/apt/sources.list && \
+    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee -a /etc/apt/sources.list && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 C857C906 2B90D010 && \
+    apt-get update && \
+    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \
+    apt-get install -y oracle-java8-installer && \
+    echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
+    curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
+    apt-get update && apt-get install -y bazel && apt-get upgrade -y bazel && \
+    pip install numpy --upgrade && \
+    cd /usr/local/src && git clone https://github.com/tensorflow/tensorflow && \
+    cd tensorflow && cat /dev/null | ./configure && \
+    bazel build --config=opt --config=cuda --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" //tensorflow/tools/pip_package:build_pip_package && \
+    bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg && \
+    pip install virtualenv && \
+    R -e 'keras::install_keras(tensorflow = "'$(ls /tmp/tensorflow_pkg/tensorflow*.whl)'")' && \
+    rm -Rf /tmp/tensorflow_pkg
 # Py3 handles a read-only environment fine, but Py2.7 needs
 # help https://docs.python.org/2/using/cmdline.html#envvar-PYTHONDONTWRITEBYTECODE
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -110,10 +134,5 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # where to find it.
 # https://rstudio.github.io/reticulate/articles/versions.html
 ENV RETICULATE_PYTHON="/root/.virtualenvs/r-tensorflow/bin/python"
-
-# Finally, apply any locally defined patches.
-ADD patches/ /tmp/patches/
-RUN /bin/bash -c \
-    "cd / && for p in $(ls /tmp/patches/*.patch); do echo '= Applying patch '\${p}; patch -p2 < \${p}; done"
 
 CMD ["R"]
