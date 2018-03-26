@@ -36,6 +36,24 @@ pipeline {
 
           date
           ./test
+          date
+          ./push gpu-test
+        '''
+      }
+    }
+
+    stage('Test Image on GPU') {
+      agent { label 'linux && gpu' }
+      steps {
+        slackSend color: 'none', message: "*<${env.BUILD_URL}console|docker-rstats GPU test>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+        sh '''#!/bin/bash
+          set -exo pipefail
+
+          date
+          gcloud docker -- pull gcr.io/kaggle-private-byod/rstats:gpu-test
+          docker tag gcr.io/kaggle-private-byod/rstats:gpu-test kaggle/rstats-build:latest
+          date
+          EXPECT_GPU=1 ./test
         '''
       }
     }
