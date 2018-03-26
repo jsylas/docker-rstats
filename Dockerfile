@@ -138,4 +138,7 @@ ENV RETICULATE_PYTHON="/root/.virtualenvs/r-tensorflow/bin/python"
 # gpuR.  Do not test loading the libary as that only works on systems GPUs.
 RUN R -e 'install.packages("gpuR", INSTALL_opts=c("--no-test-load"))'
 
+# kmcudaR
+RUN CPATH=/usr/local/cuda-9.1/targets/x86_64-linux/include install2.r --error --repo http://cran.rstudio.com kmcudaR
+
 CMD ["R"]
