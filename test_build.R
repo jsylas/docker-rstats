@@ -38,6 +38,8 @@ Library("rstan")
 Library("prophet")
 Library("fftw")
 Library("seewave")
+Library("kmcudaR")
+Library("h2o4gpu")
 
 testPlot1 <- ggplot(data.frame(x=1:10,y=runif(10))) + aes(x=x,y=y) + geom_line()
 ggsave(testPlot1, filename="plot1.png")
