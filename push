@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+set +x
+
+label=${1:-testing}
+
+# TODO(seb): `cuda` branch temporary changes only.
+docker tag kaggle/rstats-build:latest gcr.io/kaggle-private-byod/rstats:${label}
+gcloud docker -- push gcr.io/kaggle-private-byod/rstats:${label}
+
+#docker tag kaggle/rstats-build:latest kaggle/rstats:latest
+#docker push kaggle/rstats:latest
