@@ -19,7 +19,7 @@ pipeline {
   stages {
     stage('Docker Build') {
       steps {
-        slackSend color: 'none', message: "*<${env.BUILD_URL}console|docker build>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+        slackSend color: 'none', message: "*<${env.BUILD_URL}console|docker-rstats build>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
         sh '''#!/bin/bash
           set -exo pipefail
 
@@ -30,7 +30,7 @@ pipeline {
 
     stage('Test Image') {
       steps {
-        slackSend color: 'none', message: "*<${env.BUILD_URL}console|test image>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+        slackSend color: 'none', message: "*<${env.BUILD_URL}console|docker-rstats image test>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
         sh '''#!/bin/bash
           set -exo pipefail
 
@@ -42,7 +42,7 @@ pipeline {
 
     stage('Push Image') {
       steps {
-        slackSend color: 'none', message: "*<${env.BUILD_URL}console|pushing image>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+        slackSend color: 'none', message: "*<${env.BUILD_URL}console|docker-rstats image push>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
         sh '''#!/bin/bash
           set -exo pipefail
 
@@ -55,13 +55,13 @@ pipeline {
 
   post {
     failure {
-      slackSend color: 'danger', message: "*<${env.BUILD_URL}console|failed>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+      slackSend color: 'danger', message: "*<${env.BUILD_URL}console|docker-rstats failed>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
     }
     success {
-      slackSend color: 'good', message: "*<${env.BUILD_URL}console|passed>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+      slackSend color: 'good', message: "*<${env.BUILD_URL}console|docker-rstats passed>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
     }
     aborted {
-      slackSend color: 'warning', message: "*<${env.BUILD_URL}console|aborted>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
+      slackSend color: 'warning', message: "*<${env.BUILD_URL}console|docker-rstats aborted>* ${GIT_COMMIT_SUMMARY}", channel: env.SLACK_CHANNEL
     }
   }
 }
