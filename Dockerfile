@@ -135,4 +135,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # https://rstudio.github.io/reticulate/articles/versions.html
 ENV RETICULATE_PYTHON="/root/.virtualenvs/r-tensorflow/bin/python"
 
+# gpuR.  Do not test loading the libary as that only works on systems GPUs.
+RUN R -e 'install.packages("gpuR", INSTALL_opts=c("--no-test-load"))'
+
 CMD ["R"]
