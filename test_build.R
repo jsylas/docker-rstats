@@ -7,6 +7,9 @@ Library <- function(libname){
   suppressPackageStartupMessages(library(libname, character.only=TRUE))
 }
 
+# TODO(seb): Figure out why h2o4gpu fails to load when done following the
+# keras_model_sequential() statement.
+Library("h2o4gpu")
 Library("keras")
 print("Testing keras-python connection")
 m <- keras_model_sequential()
@@ -41,7 +44,6 @@ Library("prophet")
 Library("fftw")
 Library("seewave")
 Library("kmcudaR")
-Library("h2o4gpu")
 Library("bayesCL")
 if (expectGPU) {
   Library("gpuR")
