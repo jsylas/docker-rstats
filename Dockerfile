@@ -145,6 +145,7 @@ RUN CPATH=/usr/local/cuda-9.1/targets/x86_64-linux/include install2.r --error --
 RUN install2.r --error --repo http://cran.rstudio.com h2o4gpu
 
 # bayesCL
-RUN install2.r --error --repo http://cran.rstudio.com bayesCL
+RUN apt-get install -y --no-install-recommends ocl-icd-opencl-dev && \
+    install2.r --error --repo http://cran.rstudio.com bayesCL
 
 CMD ["R"]
