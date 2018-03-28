@@ -135,17 +135,20 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # https://rstudio.github.io/reticulate/articles/versions.html
 ENV RETICULATE_PYTHON="/root/.virtualenvs/r-tensorflow/bin/python"
 
-# gpuR.  Do not test loading the libary as that only works on systems GPUs.
-RUN R -e 'install.packages("gpuR", INSTALL_opts=c("--no-test-load"))'
-
 # kmcudaR
 RUN CPATH=/usr/local/cuda-9.1/targets/x86_64-linux/include install2.r --error --repo http://cran.rstudio.com kmcudaR
 
 # h2o4cuda
 RUN install2.r --error --repo http://cran.rstudio.com h2o4gpu
 
+# OpenCL for bayesCL, gpuR, ...
+RUN apt-get install -y --no-install-recommends ocl-icd-opencl-dev
+
 # bayesCL
-RUN apt-get install -y --no-install-recommends ocl-icd-opencl-dev && \
-    install2.r --error --repo http://cran.rstudio.com bayesCL
+RUN install2.r --error --repo http://cran.rstudio.com bayesCL
+
+# gpuR.  Do not test loading the libary as that only works on systems GPUs.
+RUN R -e 'install.packages("gpuR", INSTALL_opts=c("--no-test-load"))'
+
 
 CMD ["R"]
