@@ -59,7 +59,7 @@ lib_device <- reticulate::import(module = "tensorflow.python.client.device_lib",
 lib_device$list_local_devices()
 stopifnot(lib_device$list_local_devices()[[1]]$name == "/device:CPU:0")
 if (expectGPU) {
-  stopifnot(lib_device$list_local_devices()[[1]]$name == "/device:GPU:0")
+  stopifnot(lib_device$list_local_devices()[[2]]$name == "/device:GPU:0")
 }
 
 testPlot1 <- ggplot(data.frame(x=1:10,y=runif(10))) + aes(x=x,y=y) + geom_line()
